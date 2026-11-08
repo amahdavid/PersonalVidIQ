@@ -1,0 +1,9 @@
+{
+  "kind": "youtube#playlistItemListResponse",
+  "nextPageToken": "PAGE2",
+  "pageInfo": { "totalResults": 3, "resultsPerPage": 2 },
+  "items": [
+    { "snippet": { "title": "Newest", "publishedAt": "2026-11-07T00:00:00Z" }, "contentDetails": { "videoId": "v1111111111", "videoPublishedAt": "2026-11-06T20:00:00Z" } },
+    { "snippet": { "title": "Second" }, "contentDetails": { "videoId": "v2222222222", "videoPublishedAt": "2026-11-05T20:00:00Z" } }
+  ]
+}

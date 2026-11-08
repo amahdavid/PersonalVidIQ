@@ -48,6 +48,7 @@ dotnet test
 ```
 
 Integration tests use the `personalvidiq_test` database (override with `PERSONALVIDIQ_TEST_DB`).
+The live YouTube test runs only when `PERSONALVIDIQ_YOUTUBE_API_KEY` is set; it costs about 3 quota units.
 
 ## Connect Claude
 

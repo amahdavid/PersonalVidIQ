@@ -13,8 +13,8 @@ When a new decision is made with the user, add it to DECISIONS.md in the same ch
 ## Status
 
 - [x] Milestone 0: solution, stdio host, `get_status` tool, Postgres, tests
-- [ ] Milestone 1: YouTube Data API client (search, channels, videos, quota tracking, caching)
-- [ ] Milestone 2: EF Core entities, migrations, 30-day snapshot purge
+- [x] Milestone 1: YouTube Data API client (search, channels, videos, uploads playlist, quota ledger, search cap and cache, retries)
+- [ ] Milestone 2: EF Core entities, migrations, 30-day snapshot purge, persisted quota ledger and search cache
 - [ ] Milestone 3: analytics (velocity, outliers, comparisons)
 - [ ] Milestone 4: the MVP MCP tools, including tracking tools
 - [ ] Milestone 5: `collect` command (on demand, no scheduler)
@@ -30,7 +30,7 @@ dotnet test                                           # Microsoft.Testing.Platfo
 dotnet run --project src/PersonalVidIQ.Host -- status # setup/health report
 ```
 
-Integration tests need local Postgres (`brew services start postgresql@17`) and the `personalvidiq_test` database.
+Integration tests need local Postgres (`brew services start postgresql@17`) and the `personalvidiq_test` database. The live YouTube test is skipped unless `PERSONALVIDIQ_YOUTUBE_API_KEY` is set (about 3 units, no search).
 
 ## Rules that are easy to break
 

@@ -11,6 +11,7 @@ public sealed class SystemStatusService(
     IOptions<YouTubeOptions> youTube,
     IOptions<DataCollectionOptions> collection,
     IDatabaseProbe databaseProbe,
+    IQuotaLedger quotaLedger,
     TimeProvider timeProvider) : ISystemStatusService
 {
     public async Task<SystemStatus> GetStatusAsync(CancellationToken cancellationToken)
@@ -45,6 +46,7 @@ public sealed class SystemStatusService(
                 yt.DailySearchCallCap,
                 yt.SearchCacheHours,
                 yt.DailyQuotaUnits),
+            quotaLedger.GetUsage(),
             problems);
     }
 }

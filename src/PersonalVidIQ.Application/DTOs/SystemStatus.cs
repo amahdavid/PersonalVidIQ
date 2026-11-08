@@ -6,6 +6,7 @@ public sealed record SystemStatus(
     bool YouTubeApiKeyConfigured,
     DatabaseStatus Database,
     SettingsSummary Settings,
+    QuotaUsage Quota,
     IReadOnlyList<string> Problems);
 
 public sealed record DatabaseStatus(bool Reachable, string? ServerVersion, string? Error);

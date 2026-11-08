@@ -1,0 +1,35 @@
+{
+  "kind": "youtube#videoListResponse",
+  "items": [
+    {
+      "id": "aaaaaaaaaaa",
+      "snippet": {
+        "publishedAt": "2026-11-06T18:30:00Z",
+        "channelId": "UCaaaaaaaaaaaaaaaaaaaaaa",
+        "title": "Messi's craziest stat 🤯",
+        "description": "#shorts",
+        "thumbnails": { "high": { "url": "https://i.ytimg.com/vi/aaaaaaaaaaa/hqdefault.jpg" } },
+        "channelTitle": "Football Facts",
+        "tags": ["messi", "football"],
+        "categoryId": "17",
+        "liveBroadcastContent": "none"
+      },
+      "contentDetails": { "duration": "PT58S" },
+      "statistics": { "viewCount": "250000", "likeCount": "12000", "favoriteCount": "0", "commentCount": "340" }
+    },
+    {
+      "id": "bbbbbbbbbbb",
+      "snippet": {
+        "publishedAt": "2026-10-01T12:00:00Z",
+        "channelId": "UCaaaaaaaaaaaaaaaaaaaaaa",
+        "title": "Full tactical breakdown",
+        "description": "Long video",
+        "thumbnails": { "maxres": { "url": "https://i.ytimg.com/vi/bbbbbbbbbbb/maxresdefault.jpg" } },
+        "channelTitle": "Football Facts",
+        "liveBroadcastContent": "none"
+      },
+      "contentDetails": { "duration": "PT12M3S" },
+      "statistics": { "viewCount": "90000", "commentCount": "51" }
+    }
+  ]
+}

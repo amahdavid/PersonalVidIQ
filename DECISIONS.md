@@ -31,6 +31,15 @@ Settled 2026-11-07. The source brief is the Notion page "Personal vidIQ Alternat
 - **Shape of the stdio host**: one console app, `PersonalVidIQ.Host` (replaces the brief's `PersonalVidIQ.Api`), built as `personalvidiq` with the generic host plus the MCP C# SDK stdio transport. Commands: `mcp` (Claude launches it), `status`, and `collect` (added with Milestone 5). It needs no ASP.NET Core web host, because nothing is served over HTTP. Logs go to stderr only, never stdout, because stdio carries the protocol.
 - **Milestone 0 stack (2026-11-08)**: .NET 10.0.403 SDK (LTS), ModelContextProtocol 2.4.0, EF Core / Npgsql 10, xUnit v3 on Microsoft.Testing.Platform, central package versions in `Directory.Packages.props`. Postgres 17 runs as a Homebrew login service; databases `personalvidiq` and `personalvidiq_test`.
 
+## Milestone 1 notes (2026-11-08)
+
+- **Quota day**: counted midnight to midnight Pacific Time, like YouTube. Failed calls and retries are counted too, because YouTube charges for them. Quota costs per endpoint are configurable (`YouTube:QuotaCosts`).
+- **Per-process for now**: the quota ledger and the 24 h search cache live in memory, so they reset when Claude restarts the server. Milestone 2 moves both into PostgreSQL, so the MCP server and the CLI share one count.
+- **Local guard**: a call that would push the day's count over `DailyQuotaUnits` is refused before it's sent.
+- **Retries**: up to 3, with exponential backoff, for network errors, 5xx and rate limits only. Quota, key and not-found errors fail at once, with a plain message that never includes the key.
+- **Legacy `/c/` URLs** can't be resolved through the API, so the error asks for the @handle or the `/channel/UC…` URL instead. `/user/` URLs use `forUsername`.
+- **Search's `videoDuration=short` filter** means "under 4 minutes" to YouTube, not "is a Short". Format is still decided by the 180 s rule.
+
 ## Out of scope: ChatGPT and remote access
 
 There's no ChatGPT milestone. For reference only, from OpenAI's Apps SDK auth docs (checked 2026-11-07): ChatGPT would need a public HTTPS tunnel and OAuth 2.1, and it can't send API keys. Because the tool is local-only, the brief's items on remote exposure (remote auth and secure remote deployment in Milestone 4) don't apply.

@@ -1,0 +1,36 @@
+{
+  "kind": "youtube#channelListResponse",
+  "etag": "x",
+  "pageInfo": { "totalResults": 2, "resultsPerPage": 5 },
+  "items": [
+    {
+      "kind": "youtube#channel",
+      "id": "UCaaaaaaaaaaaaaaaaaaaaaa",
+      "snippet": {
+        "title": "Football Facts",
+        "description": "Daily football Shorts.",
+        "customUrl": "@footballfacts",
+        "publishedAt": "2021-03-04T10:00:00Z",
+        "thumbnails": {
+          "default": { "url": "https://yt3.ggpht.com/a-default.jpg", "width": 88, "height": 88 },
+          "high": { "url": "https://yt3.ggpht.com/a-high.jpg", "width": 800, "height": 800 }
+        },
+        "country": "GB"
+      },
+      "contentDetails": { "relatedPlaylists": { "likes": "", "uploads": "UUaaaaaaaaaaaaaaaaaaaaaa" } },
+      "statistics": { "viewCount": "123456789", "subscriberCount": "1230000", "hiddenSubscriberCount": false, "videoCount": "842" }
+    },
+    {
+      "kind": "youtube#channel",
+      "id": "UCbbbbbbbbbbbbbbbbbbbbbb",
+      "snippet": {
+        "title": "Hidden Subs FC",
+        "description": "",
+        "publishedAt": "2019-01-01T00:00:00Z",
+        "thumbnails": { "default": { "url": "https://yt3.ggpht.com/b-default.jpg" } }
+      },
+      "contentDetails": { "relatedPlaylists": { "uploads": "UUbbbbbbbbbbbbbbbbbbbbbb" } },
+      "statistics": { "viewCount": "5000", "hiddenSubscriberCount": true, "videoCount": "12" }
+    }
+  ]
+}

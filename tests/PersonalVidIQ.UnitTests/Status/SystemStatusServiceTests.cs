@@ -3,6 +3,7 @@ using PersonalVidIQ.Application.DTOs;
 using PersonalVidIQ.Application.Options;
 using PersonalVidIQ.Infrastructure.Persistence;
 using PersonalVidIQ.Infrastructure.Status;
+using PersonalVidIQ.Infrastructure.YouTube;
 
 namespace PersonalVidIQ.UnitTests.Status;
 
@@ -18,11 +19,17 @@ public sealed class SystemStatusServiceTests
         public override DateTimeOffset GetUtcNow() => now;
     }
 
-    private static SystemStatusService Create(string? apiKey, DatabaseStatus db) => new(
-        Options.Create(new YouTubeOptions { ApiKey = apiKey }),
-        Options.Create(new DataCollectionOptions()),
-        new FakeProbe(db),
-        new FixedTime(new DateTimeOffset(2026, 11, 8, 12, 0, 0, TimeSpan.Zero)));
+    private static SystemStatusService Create(string? apiKey, DatabaseStatus db)
+    {
+        var youTube = Options.Create(new YouTubeOptions { ApiKey = apiKey });
+        var time = new FixedTime(new DateTimeOffset(2026, 11, 8, 12, 0, 0, TimeSpan.Zero));
+        return new(
+            youTube,
+            Options.Create(new DataCollectionOptions()),
+            new FakeProbe(db),
+            new InMemoryQuotaLedger(youTube, time),
+            time);
+    }
 
     [Fact]
     public async Task No_problems_when_key_set_and_database_reachable()

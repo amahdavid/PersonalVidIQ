@@ -1,0 +1,7 @@
+{
+  "kind": "youtube#playlistItemListResponse",
+  "pageInfo": { "totalResults": 3, "resultsPerPage": 2 },
+  "items": [
+    { "snippet": { "title": "Third" }, "contentDetails": { "videoId": "v3333333333", "videoPublishedAt": "2026-11-01T20:00:00Z" } }
+  ]
+}

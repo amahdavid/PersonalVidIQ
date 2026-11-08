@@ -29,4 +29,26 @@ public sealed class YouTubeOptions
     /// <summary>How long a search result is reused for the same normalised query. DECISIONS.md #8.</summary>
     [Range(0, 168)]
     public int SearchCacheHours { get; set; } = 24;
+
+    /// <summary>
+    /// Quota units charged per call, by endpoint. Defaults follow
+    /// https://developers.google.com/youtube/v3/determine_quota_cost; override in config if Google changes them.
+    /// Unlisted endpoints are assumed to cost 1 unit.
+    /// </summary>
+    public Dictionary<string, int> QuotaCosts { get; set; } = new(StringComparer.Ordinal)
+    {
+        ["search.list"] = 100,
+        ["channels.list"] = 1,
+        ["videos.list"] = 1,
+        ["playlistItems.list"] = 1,
+    };
+
+    /// <summary>Retries for network errors, 5xx and rate limiting. Quota and key errors are never retried.</summary>
+    [Range(0, 5)]
+    public int MaxRetries { get; set; } = 3;
+
+    [Range(1, 120)]
+    public int RequestTimeoutSeconds { get; set; } = 30;
+
+    public int CostOf(string endpoint) => QuotaCosts.TryGetValue(endpoint, out var cost) ? cost : 1;
 }
