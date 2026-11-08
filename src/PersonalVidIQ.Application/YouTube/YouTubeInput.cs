@@ -80,7 +80,7 @@ public static partial class YouTubeInput
             throw Invalid($"'{value}' is a YouTube URL but not a channel URL. Use youtube.com/@handle or youtube.com/channel/UC….");
         }
 
-        throw Invalid($"'{value}' isn't a channel id, @handle or channel URL. Handles need the @, e.g. @kakae.");
+        throw Invalid($"'{value}' isn't a channel id, @handle or channel URL. Handles need the @, e.g. @channelname.");
     }
 
     /// <summary>

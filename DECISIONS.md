@@ -2,6 +2,8 @@
 
 Settled 2026-11-07. The source brief is the Notion page "Personal vidIQ Alternative — Implementation Brief" (`411bce3163cf81738d0bc965debedf67`). Where this file differs from the brief, this file wins. The Notion page has not been edited yet.
 
+**Purpose (2026-11-08):** a general-purpose tool for any YouTube channel and niche, not just one channel. The goal is reliable, clearly sourced data for making decisions about a channel. Nothing is tuned to one genre.
+
 ## Decided with the user
 
 | # | Topic | Decision | Changes to the brief |

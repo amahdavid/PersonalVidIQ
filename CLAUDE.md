@@ -1,6 +1,8 @@
 # PersonalVidIQ
 
-A private, local-only YouTube research tool for the user's football Shorts channel. Claude (Desktop/Code) is the only client, through a **local stdio MCP server**. Nothing runs online: no HTTP endpoint, tunnel, OAuth or ChatGPT.
+A private, local-only YouTube research tool for **any channel in any niche**, whether Shorts, long-form or both. Its job is to give the user **reliable, clearly sourced data so they can make informed decisions about their channel**. Claude (Desktop/Code) is the only client, through a **local stdio MCP server**. Nothing runs online: no HTTP endpoint, tunnel, OAuth or ChatGPT.
+
+Reliability comes before cleverness. Every number says where it came from, how it was worked out, and how far to trust it. When the data can't support an answer, the tool says "unavailable" and why. Never hard-code anything niche-specific (topics, keywords, channel lists, thresholds tuned to one genre); keep it configurable. Test fixtures happen to use football sample data, and that's all it is.
 
 ## Sources of truth
 
