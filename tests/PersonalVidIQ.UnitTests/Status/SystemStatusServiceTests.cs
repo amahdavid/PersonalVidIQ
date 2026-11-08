@@ -1,5 +1,8 @@
 using Microsoft.Extensions.Options;
+using PersonalVidIQ.Application.Collection;
 using PersonalVidIQ.Application.DTOs;
+using PersonalVidIQ.Application.Interfaces;
+using PersonalVidIQ.Domain.Entities;
 using PersonalVidIQ.Application.Options;
 using PersonalVidIQ.Infrastructure.Persistence;
 using PersonalVidIQ.Infrastructure.Status;
@@ -20,6 +23,20 @@ public sealed class SystemStatusServiceTests
             Task.FromResult(new StorageStatus([], 1, 2, 3, 4, 5, null));
     }
 
+    private sealed class EmptyCollectionState : ICollectionStateStore
+    {
+        public Task<IReadOnlyList<TrackedChannelState>> GetTrackedChannelsAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<TrackedChannelState>>([]);
+        public Task<IReadOnlyList<TrackedVideoState>> GetTrackedVideosAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<TrackedVideoState>>([]);
+        public Task<IReadOnlySet<string>> GetStoredVideoIdsAsync(IReadOnlyCollection<string> videoIds, CancellationToken cancellationToken) => Task.FromResult<IReadOnlySet<string>>(new HashSet<string>());
+    }
+
+    private sealed class EmptyRunLog : ICollectionRunLog
+    {
+        public Task<long> StartAsync(string trigger, bool forced, CancellationToken cancellationToken) => Task.FromResult(1L);
+        public Task CompleteAsync(long runId, CollectionRun result, CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task<CollectionRun?> GetLastAsync(CancellationToken cancellationToken) => Task.FromResult<CollectionRun?>(null);
+    }
+
     private sealed class FixedTime(DateTimeOffset now) : TimeProvider
     {
         public override DateTimeOffset GetUtcNow() => now;
@@ -35,6 +52,8 @@ public sealed class SystemStatusServiceTests
             new FakeProbe(db),
             new FakeStorage(),
             new InMemoryQuotaLedger(youTube, time),
+            new EmptyCollectionState(),
+            new EmptyRunLog(),
             time);
     }
 

@@ -17,6 +17,8 @@ public sealed class PersonalVidIQDbContext(DbContextOptions<PersonalVidIQDbConte
 
     public DbSet<SearchCacheEntry> SearchCache => Set<SearchCacheEntry>();
 
+    public DbSet<CollectionRun> CollectionRuns => Set<CollectionRun>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Channel>(e =>
@@ -71,6 +73,14 @@ public sealed class PersonalVidIQDbContext(DbContextOptions<PersonalVidIQDbConte
             e.Property(s => s.Key).HasMaxLength(512);
             e.Property(s => s.ResultJson).HasColumnType("jsonb");
             e.HasIndex(s => s.ExpiresAtUtc);
+        });
+
+        modelBuilder.Entity<CollectionRun>(e =>
+        {
+            e.HasIndex(r => r.StartedAtUtc);
+            e.Property(r => r.Trigger).HasMaxLength(16);
+            e.Property(r => r.Status).HasMaxLength(16);
+            e.Property(r => r.Error).HasMaxLength(2000);
         });
     }
 }

@@ -35,6 +35,7 @@ public sealed class RetentionService(
             .ExecuteDeleteAsync(cancellationToken);
         var searchCache = await db.SearchCache.Where(s => s.ExpiresAtUtc <= now).ExecuteDeleteAsync(cancellationToken);
         var quota = await db.QuotaUsage.Where(q => q.QuotaDayStartUtc < quotaCutoff).ExecuteDeleteAsync(cancellationToken);
+        await db.CollectionRuns.Where(r => r.StartedAtUtc < quotaCutoff).ExecuteDeleteAsync(cancellationToken);
 
         var result = new RetentionResult(videoSnapshots, channelSnapshots, videos, channels, searchCache, quota, now);
         if (result.Total > 0)

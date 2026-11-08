@@ -16,11 +16,13 @@ using PersonalVidIQ.Mcp;
 //   personalvidiq status     print the setup/status report and exit
 //   personalvidiq migrate    apply pending database migrations
 //   personalvidiq purge      delete data past the 30-day retention window
+//   personalvidiq collect [--force] [--dry-run]   refresh tracked items that are due
 var command = args.Length > 0 ? args[0].ToLowerInvariant() : "mcp";
+var flags = args.Skip(1).Where(a => a.StartsWith("--", StringComparison.Ordinal)).Select(a => a.ToLowerInvariant()).ToHashSet();
 
 var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
 {
-    Args = args.Skip(1).ToArray(),
+    Args = args.Skip(1).Where(a => !a.StartsWith("--", StringComparison.Ordinal) || a.Contains('=')).ToArray(),
     // Claude starts the server from an arbitrary working directory; load config next to the binary.
     ContentRootPath = AppContext.BaseDirectory,
 });
@@ -71,8 +73,18 @@ switch (command)
         return 0;
     }
 
+    case "collect":
+    {
+        using var host = builder.Build();
+        await DatabaseStartup.PrepareAsync(host.Services, CancellationToken.None);
+        var report = await host.Services.GetRequiredService<PersonalVidIQ.Application.Interfaces.ICollectionService>()
+            .CollectAsync(new PersonalVidIQ.Application.Collection.CollectRequest("cli", flags.Contains("--force"), flags.Contains("--dry-run")), CancellationToken.None);
+        Console.WriteLine(JsonSerializer.Serialize(report, json));
+        return report.Status is "Succeeded" or "Planned" ? 0 : 1;
+    }
+
     default:
-        Console.Error.WriteLine($"Unknown command '{command}'. Use: mcp | status | migrate | purge");
+        Console.Error.WriteLine($"Unknown command '{command}'. Use: mcp | status | migrate | purge | collect [--force] [--dry-run]");
         return 2;
 }
 

@@ -105,6 +105,24 @@ Settled 2026-11-07. The source brief is the Notion page "Personal vidIQ Alternat
 - **Errors** come back to Claude as tool errors with a plain label: Setup needed, API key problem, Quota used up, Search cap reached, Not found, Invalid input, or YouTube temporarily unavailable.
 - **Connected to Claude Code** at user scope through the published copy in `~/.local/share/personalvidiq`. Claude Desktop is not configured yet.
 
+## Milestone 5 notes (2026-11-08)
+
+- **Refreshing** is on demand, with no scheduler (#6): run the `refresh_tracked` tool or `personalvidiq collect`.
+  - Each refresh first runs the retention purge, then collects only what's due.
+  - Due rules:
+    - Videos under 48 h old: every 3 h.
+    - Up to 30 days old: daily.
+    - Older: weekly, which also keeps metadata inside the 30-day refresh rule.
+    - Channel stats: daily.
+    - Each tracked channel's uploads playlist (latest 20): every 3 h.
+  - An item counts as due once 90% of its interval has passed. Time is measured as real elapsed time, so laptop sleep only delays things.
+- **New uploads**: any video id in a tracked channel's latest uploads that PersonalVidIQ has never stored gets tracked automatically. Videos you untracked stay untracked, because they're still stored.
+- **Deleted or private videos** that YouTube no longer returns are untracked and listed in the report.
+- **Quota budget**: a refresh leaves `QuotaReserveUnits` (1,000) for searches and lookups. If the budget is short, the channel work is skipped and the oldest-tier videos are dropped first. Whatever's skipped stays due.
+- **`force`** refreshes everything now, but the 15-minute snapshot spacing still applies. **`dryRun`** shows what's due and the estimated units without fetching anything.
+- **Run log**: each refresh is recorded in `collection_runs` (status, counts, units, error) and kept for 7 days. `get_status` shows the last run, what's due now and when the next item comes due.
+- **Typical cost**: about 1 unit per 50 due videos, plus 1 per tracked channel's uploads check.
+
 ## Out of scope: ChatGPT and remote access
 
 There's no ChatGPT milestone. For reference only, from OpenAI's Apps SDK auth docs (checked 2026-11-07): ChatGPT would need a public HTTPS tunnel and OAuth 2.1, and it can't send API keys. Because the tool is local-only, the brief's items on remote exposure (remote auth and secure remote deployment in Milestone 4) don't apply.

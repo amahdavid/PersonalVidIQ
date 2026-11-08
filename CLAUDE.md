@@ -19,7 +19,7 @@ When a new decision is made with the user, add it to DECISIONS.md in the same ch
 - [x] Milestone 2: EF Core entities, migrations, stores, idempotent snapshots, 30-day purge, Postgres quota ledger and search cache
 - [x] Milestone 3: analytics (velocity, lifetime views/day, engagement rates, outlier scoring, video/channel comparison services)
 - [x] Milestone 4: 14 MCP tools (search, channel/video lookups, analysis, outliers, comparisons, tracking, status); registered with Claude Code
-- [ ] Milestone 5: `refresh_tracked` tool + `collect` command (on demand, no scheduler, due rules)
+- [x] Milestone 5: `refresh_tracked` tool + `collect` command (on demand, due rules, new-upload pickup, quota budget, run log)
 - [ ] Milestone 6: research features (no autocomplete)
 
 Update this list when a milestone lands.
@@ -32,6 +32,7 @@ dotnet test                                           # Microsoft.Testing.Platfo
 dotnet run --project src/PersonalVidIQ.Host -- status # setup/health report
 dotnet run --project src/PersonalVidIQ.Host -- migrate
 dotnet run --project src/PersonalVidIQ.Host -- purge
+dotnet run --project src/PersonalVidIQ.Host -- collect [--force] [--dry-run]
 dotnet ef migrations add <Name> --project src/PersonalVidIQ.Infrastructure --output-dir Persistence/Migrations
 ```
 
@@ -52,7 +53,7 @@ Integration tests need local Postgres (`brew services start postgresql@17`) and 
 
 ## MCP tools
 
-`get_status`, `search_youtube`, `get_channel`, `get_channel_videos`, `get_video`, `analyze_video`, `compare_videos`, `compare_channels`, `find_outliers`, `track_channel`, `untrack_channel`, `track_video`, `untrack_video`, `list_tracked`.
+`get_status`, `search_youtube`, `get_channel`, `get_channel_videos`, `get_video`, `analyze_video`, `compare_videos`, `compare_channels`, `find_outliers`, `track_channel`, `untrack_channel`, `track_video`, `untrack_video`, `list_tracked`, `refresh_tracked`.
 
 - **Tool classes** (`src/PersonalVidIQ.Mcp/Tools`) only parse parameters and call a service through `ToolGuard.Run`, which turns `YouTubeApiException` into a readable `McpException`.
 - **Enums** serialize as snake_case strings.

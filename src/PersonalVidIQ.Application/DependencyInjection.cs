@@ -13,6 +13,7 @@ public static class DependencyInjection
         services.AddTransient<IChannelResearchService, ChannelResearchService>();
         services.AddTransient<IResearchService, ResearchService>();
         services.AddTransient<ITrackingService, TrackingService>();
+        services.AddTransient<ICollectionService, CollectionService>();
         return services;
     }
 }

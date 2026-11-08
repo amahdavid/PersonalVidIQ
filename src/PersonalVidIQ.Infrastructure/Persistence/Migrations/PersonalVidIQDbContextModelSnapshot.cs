@@ -161,6 +161,73 @@ namespace PersonalVidIQ.Infrastructure.Persistence.Migrations
                     b.ToTable("channel_snapshots", (string)null);
                 });
 
+            modelBuilder.Entity("PersonalVidIQ.Domain.Entities.CollectionRun", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("ChannelsRefreshed")
+                        .HasColumnType("integer")
+                        .HasColumnName("channels_refreshed");
+
+                    b.Property<DateTimeOffset?>("CompletedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed_at_utc");
+
+                    b.Property<string>("Error")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("error");
+
+                    b.Property<bool>("Forced")
+                        .HasColumnType("boolean")
+                        .HasColumnName("forced");
+
+                    b.Property<int>("NewVideosTracked")
+                        .HasColumnType("integer")
+                        .HasColumnName("new_videos_tracked");
+
+                    b.Property<int>("SnapshotsSaved")
+                        .HasColumnType("integer")
+                        .HasColumnName("snapshots_saved");
+
+                    b.Property<DateTimeOffset>("StartedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("started_at_utc");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Trigger")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("trigger");
+
+                    b.Property<int>("UnitsUsed")
+                        .HasColumnType("integer")
+                        .HasColumnName("units_used");
+
+                    b.Property<int>("VideosRefreshed")
+                        .HasColumnType("integer")
+                        .HasColumnName("videos_refreshed");
+
+                    b.HasKey("Id")
+                        .HasName("pk_collection_runs");
+
+                    b.HasIndex("StartedAtUtc")
+                        .HasDatabaseName("ix_collection_runs_started_at_utc");
+
+                    b.ToTable("collection_runs", (string)null);
+                });
+
             modelBuilder.Entity("PersonalVidIQ.Domain.Entities.QuotaUsageEntry", b =>
                 {
                     b.Property<DateTimeOffset>("QuotaDayStartUtc")

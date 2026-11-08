@@ -53,7 +53,7 @@ public sealed class StdioServerTests
 
         Assert.Equal(
             ["analyze_video", "compare_channels", "compare_videos", "find_outliers", "get_channel", "get_channel_videos", "get_status",
-             "get_video", "list_tracked", "search_youtube", "track_channel", "track_video", "untrack_channel", "untrack_video"],
+             "get_video", "list_tracked", "refresh_tracked", "search_youtube", "track_channel", "track_video", "untrack_channel", "untrack_video"],
             names);
     }
 

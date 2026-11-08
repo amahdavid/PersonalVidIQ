@@ -43,6 +43,8 @@ public static class DependencyInjection
         services.AddSingleton<IRetentionService, RetentionService>();
         services.AddSingleton<IQuotaLedger, PostgresQuotaLedger>();
         services.AddSingleton<ISearchCache, PostgresSearchCache>();
+        services.AddSingleton<ICollectionStateStore, CollectionStateStore>();
+        services.AddSingleton<ICollectionRunLog, CollectionRunLog>();
         services.AddHttpClient<IYouTubeDataClient, YouTubeDataClient>((sp, client) =>
         {
             var yt = sp.GetRequiredService<IOptions<YouTubeOptions>>().Value;

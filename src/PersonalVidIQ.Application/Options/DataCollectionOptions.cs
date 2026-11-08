@@ -48,6 +48,25 @@ public sealed class DataCollectionOptions
     [Range(1, 30)]
     public int StaleMetadataDays { get; set; } = 30;
 
+    /// <summary>How often a tracked channel's uploads playlist is checked for new videos.</summary>
+    [Range(1, 168)]
+    public int UploadsCheckIntervalHours { get; set; } = 3;
+
+    /// <summary>How many of the newest uploads are looked at when checking for new videos.</summary>
+    [Range(1, 50)]
+    public int UploadsCheckDepth { get; set; } = 20;
+
+    /// <summary>
+    /// An item counts as due when this fraction of its interval has passed, so refreshing a little early
+    /// (e.g. 2 h 45 m into a 3 h interval) still collects it.
+    /// </summary>
+    [Range(0.5, 1.0)]
+    public double DueTolerance { get; set; } = 0.9;
+
+    /// <summary>Quota units a refresh leaves untouched for searches and lookups.</summary>
+    [Range(0, 10_000)]
+    public int QuotaReserveUnits { get; set; } = 1_000;
+
     /// <summary>How long quota bookkeeping rows are kept. Not YouTube data.</summary>
     [Range(1, 365)]
     public int QuotaHistoryDays { get; set; } = 7;

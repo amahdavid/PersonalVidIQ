@@ -29,7 +29,7 @@ public sealed class DatabaseFixture : IAsyncLifetime
     {
         await using var db = await Factory.CreateDbContextAsync();
         await db.Database.ExecuteSqlRawAsync(
-            "TRUNCATE video_snapshots, channel_snapshots, videos, channels, quota_usage, search_cache RESTART IDENTITY CASCADE");
+            "TRUNCATE video_snapshots, channel_snapshots, videos, channels, quota_usage, search_cache, collection_runs RESTART IDENTITY CASCADE");
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;

@@ -6,6 +6,7 @@ public sealed record SystemStatus(
     bool YouTubeApiKeyConfigured,
     DatabaseStatus Database,
     StorageStatus? Storage,
+    CollectionStatus? Collection,
     SettingsSummary Settings,
     QuotaUsage Quota,
     IReadOnlyList<string> Problems);
@@ -28,3 +29,14 @@ public sealed record StorageStatus(
     int VideoSnapshots,
     int ChannelSnapshots,
     DateTimeOffset? OldestSnapshotUtc);
+
+/// <summary>Refresh state: what's due now and how the last refresh went.</summary>
+public sealed record CollectionStatus(
+    int ChannelsDue,
+    int UploadChecksDue,
+    int VideosDue,
+    DateTimeOffset? NextDueUtc,
+    DateTimeOffset? LastRunAtUtc,
+    string? LastRunStatus,
+    int? LastRunUnitsUsed,
+    string? LastRunError);

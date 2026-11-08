@@ -100,9 +100,22 @@ Then start a new Claude session and ask it to "run get_status on personalvidiq".
 | `find_outliers` | A channel's videos beating its own baseline | ~3 |
 | `track_channel` / `track_video` | Start building history | ~3 / 1–2 |
 | `untrack_channel` / `untrack_video` / `list_tracked` | Manage tracking | 0 |
+| `refresh_tracked` | Snapshot what's due, pick up new uploads (`force`, `dryRun`) | ~1–10 |
 
 User secrets are read from `~/.microsoft/usersecrets/`, so the published copy picks up the same API key.
 stdout is reserved for the MCP protocol; logs go to stderr (Claude Desktop shows them in its MCP logs).
+
+## Building history
+
+Velocity and growth need repeated snapshots. Nothing runs in the background: ask Claude to run `refresh_tracked`
+at the start of a session, or run it yourself:
+
+```bash
+dotnet run --project src/PersonalVidIQ.Host -- collect            # what's due
+dotnet run --project src/PersonalVidIQ.Host -- collect --dry-run  # preview and estimated cost
+```
+
+New videos are snapshotted every 3 h for their first 48 h, then daily, then weekly after 30 days.
 
 ## Data retention
 

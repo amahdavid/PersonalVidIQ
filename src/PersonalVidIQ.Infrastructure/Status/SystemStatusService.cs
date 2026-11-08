@@ -13,6 +13,8 @@ public sealed class SystemStatusService(
     IDatabaseProbe databaseProbe,
     IStorageProbe storageProbe,
     IQuotaLedger quotaLedger,
+    ICollectionStateStore collectionState,
+    ICollectionRunLog runLog,
     TimeProvider timeProvider) : ISystemStatusService
 {
     public async Task<SystemStatus> GetStatusAsync(CancellationToken cancellationToken)
@@ -34,6 +36,7 @@ public sealed class SystemStatusService(
         }
 
         StorageStatus? storage = null;
+        CollectionStatus? collectionStatus = null;
         QuotaUsage quota;
         if (database.Reachable)
         {
@@ -46,6 +49,7 @@ public sealed class SystemStatusService(
             else
             {
                 quota = await quotaLedger.GetUsageAsync(cancellationToken);
+                collectionStatus = await CollectionAsync(dc, cancellationToken);
             }
         }
         else
@@ -62,6 +66,7 @@ public sealed class SystemStatusService(
             apiKeyConfigured,
             database,
             storage,
+            collectionStatus,
             new SettingsSummary(
                 dc.SnapshotRetentionDays,
                 dc.ShortsMaxDurationSeconds,
@@ -70,6 +75,27 @@ public sealed class SystemStatusService(
                 yt.DailyQuotaUnits),
             quota,
             problems);
+    }
+
+    private async Task<CollectionStatus> CollectionAsync(DataCollectionOptions dc, CancellationToken cancellationToken)
+    {
+        var now = timeProvider.GetUtcNow();
+        var plan = Application.Collection.CollectionPlanner.Plan(
+            await collectionState.GetTrackedChannelsAsync(cancellationToken),
+            await collectionState.GetTrackedVideosAsync(cancellationToken),
+            new Application.Collection.DuePolicy(dc),
+            now,
+            force: false);
+        var last = await runLog.GetLastAsync(cancellationToken);
+        return new CollectionStatus(
+            plan.ChannelsToSnapshot.Count,
+            plan.ChannelsToCheckForUploads.Count,
+            plan.VideosToSnapshot.Count,
+            plan.NextDueUtc,
+            last?.StartedAtUtc,
+            last?.Status,
+            last?.UnitsUsed,
+            last?.Error);
     }
 
     private QuotaUsage EmptyQuota(YouTubeOptions yt)
