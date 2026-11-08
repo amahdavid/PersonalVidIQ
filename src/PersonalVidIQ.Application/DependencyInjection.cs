@@ -11,6 +11,8 @@ public static class DependencyInjection
         services.AddTransient<ChannelVideoLoader>();
         services.AddTransient<IVideoAnalysisService, VideoAnalysisService>();
         services.AddTransient<IChannelResearchService, ChannelResearchService>();
+        services.AddTransient<IResearchService, ResearchService>();
+        services.AddTransient<ITrackingService, TrackingService>();
         return services;
     }
 }

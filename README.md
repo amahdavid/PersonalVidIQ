@@ -83,7 +83,23 @@ claude mcp add --scope user personalvidiq -- /opt/homebrew/bin/dotnet ~/.local/s
 }
 ```
 
-Then ask Claude to "run get_status on personalvidiq".
+Then start a new Claude session and ask it to "run get_status on personalvidiq".
+
+### Tools
+
+| Tool | What it does | Quota |
+|---|---|---|
+| `get_status` | Setup check, storage and today's quota | 0 |
+| `search_youtube` | Search videos on a topic, with stats | 101 (cached 24 h, 50/day cap) |
+| `get_channel` | Channel details and stats | 1 |
+| `get_channel_videos` | Recent or most-viewed uploads, optional Shorts/long-form filter | ~3–9 |
+| `get_video` | Video details, stats and rates | 1 |
+| `analyze_video` | Velocity, history, rates and outlier score | ~4 |
+| `compare_videos` | Up to 10 videos side by side | 1 |
+| `compare_channels` | Up to 5 channels over 1–30 days | ~3 each |
+| `find_outliers` | A channel's videos beating its own baseline | ~3 |
+| `track_channel` / `track_video` | Start building history | ~3 / 1–2 |
+| `untrack_channel` / `untrack_video` / `list_tracked` | Manage tracking | 0 |
 
 User secrets are read from `~/.microsoft/usersecrets/`, so the published copy picks up the same API key.
 stdout is reserved for the MCP protocol; logs go to stderr (Claude Desktop shows them in its MCP logs).

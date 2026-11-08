@@ -10,6 +10,9 @@ public interface IChannelStore
 
     Task<Channel?> FindAsync(string youTubeChannelId, CancellationToken cancellationToken);
 
+    /// <summary>Finds a stored channel by its @handle (case-insensitive), without calling YouTube.</summary>
+    Task<Channel?> FindByHandleAsync(string handle, CancellationToken cancellationToken);
+
     /// <summary>Marks a stored channel tracked or untracked. Returns false when the channel isn't stored.</summary>
     Task<bool> SetTrackedAsync(string youTubeChannelId, bool tracked, CancellationToken cancellationToken);
 

@@ -98,6 +98,7 @@ internal sealed class FakeChannelStore : IChannelStore
     public Task<Channel?> FindAsync(string youTubeChannelId, CancellationToken cancellationToken) =>
         Task.FromResult(Tracked.Contains(youTubeChannelId) ? new Channel { YouTubeChannelId = youTubeChannelId, Title = "", IsTracked = true } : null);
 
+    public Task<Channel?> FindByHandleAsync(string handle, CancellationToken cancellationToken) => Task.FromResult<Channel?>(null);
     public Task<Channel> UpsertAsync(ChannelData data, CancellationToken cancellationToken) => throw new NotSupportedException();
     public Task<bool> SetTrackedAsync(string youTubeChannelId, bool tracked, CancellationToken cancellationToken) => throw new NotSupportedException();
     public Task<IReadOnlyList<Channel>> ListTrackedAsync(CancellationToken cancellationToken) => throw new NotSupportedException();

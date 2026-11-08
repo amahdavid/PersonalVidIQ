@@ -16,8 +16,8 @@ When a new decision is made with the user, add it to DECISIONS.md in the same ch
 - [x] Milestone 1: YouTube Data API client (search, channels, videos, uploads playlist, quota ledger, search cap and cache, retries)
 - [x] Milestone 2: EF Core entities, migrations, stores, idempotent snapshots, 30-day purge, Postgres quota ledger and search cache
 - [x] Milestone 3: analytics (velocity, lifetime views/day, engagement rates, outlier scoring, video/channel comparison services)
-- [ ] Milestone 4: the MVP MCP tools, including tracking tools
-- [ ] Milestone 5: `collect` command (on demand, no scheduler)
+- [x] Milestone 4: 14 MCP tools (search, channel/video lookups, analysis, outliers, comparisons, tracking, status); registered with Claude Code
+- [ ] Milestone 5: `refresh_tracked` tool + `collect` command (on demand, no scheduler, due rules)
 - [ ] Milestone 6: research features (no autocomplete)
 
 Update this list when a milestone lands.
@@ -48,6 +48,15 @@ Integration tests need local Postgres (`brew services start postgresql@17`) and 
 - **$0/month.** No paid APIs or services, and no OpenAI or Anthropic API calls from the app. Ask before adding any dependency that costs money, and before installing software.
 - **Keep secrets out of the repo.** The API key lives in .NET user secrets (`YouTube:ApiKey`). Never log keys or connection strings.
 
+## MCP tools
+
+`get_status`, `search_youtube`, `get_channel`, `get_channel_videos`, `get_video`, `analyze_video`, `compare_videos`, `compare_channels`, `find_outliers`, `track_channel`, `untrack_channel`, `track_video`, `untrack_video`, `list_tracked`.
+
+- **Tool classes** (`src/PersonalVidIQ.Mcp/Tools`) only parse parameters and call a service through `ToolGuard.Run`, which turns `YouTubeApiException` into a readable `McpException`.
+- **Enums** serialize as snake_case strings.
+- **Every tool description** states its quota cost.
+- **Integration tests** start the real server over stdio, pointed at a closed port so they never reach YouTube. The exception is the key-gated live round trip.
+
 ## Architecture
 
 The layers are Domain → Application → Infrastructure, with Mcp and Host on top.
@@ -62,5 +71,5 @@ The layers are Domain → Application → Infrastructure, with Mcp and Host on t
 ## Environment
 
 - macOS, Apple silicon, with .NET 10 SDK and PostgreSQL 17 from Homebrew. Docker isn't installed and isn't used.
-- Claude launches the server as `/opt/homebrew/bin/dotnet ~/.local/share/personalvidiq/personalvidiq.dll mcp` (the published copy). Re-publish after changes before testing in Claude.
+- Registered with Claude Code at user scope (`claude mcp get personalvidiq`). It runs the published copy: `/opt/homebrew/bin/dotnet ~/.local/share/personalvidiq/personalvidiq.dll mcp`. After code changes, re-publish (`dotnet publish src/PersonalVidIQ.Host -c Release -o ~/.local/share/personalvidiq`) and start a new Claude session.
 - Git remote: none yet. GitHub CLI is logged in as `amahdavid`. Ask before creating a repo or pushing.

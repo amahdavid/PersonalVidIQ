@@ -48,6 +48,14 @@ public sealed class ChannelStore(IDbContextFactory<PersonalVidIQDbContext> conte
         return await db.Channels.AsNoTracking().SingleOrDefaultAsync(c => c.YouTubeChannelId == youTubeChannelId, cancellationToken);
     }
 
+    public async Task<Channel?> FindByHandleAsync(string handle, CancellationToken cancellationToken)
+    {
+        var normalised = (handle.StartsWith('@') ? handle : "@" + handle).ToLowerInvariant();
+        await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
+        return await db.Channels.AsNoTracking()
+            .FirstOrDefaultAsync(c => c.CustomUrl != null && c.CustomUrl.ToLower() == normalised, cancellationToken);
+    }
+
     public async Task<bool> SetTrackedAsync(string youTubeChannelId, bool tracked, CancellationToken cancellationToken)
     {
         await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);

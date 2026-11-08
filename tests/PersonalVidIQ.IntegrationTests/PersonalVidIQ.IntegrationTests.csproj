@@ -12,6 +12,10 @@
     <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Reuse the fake YouTube client from the unit tests. -->
+    <Compile Include="..\PersonalVidIQ.UnitTests\Services\Fakes.cs" Link="Shared\Fakes.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>

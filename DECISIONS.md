@@ -79,6 +79,30 @@ Settled 2026-11-07. The source brief is the Notion page "Personal vidIQ Alternat
 - **Free history**: whenever analysis fetches fresh stats for a video or channel that's already stored, that read is saved as a snapshot.
 - **Baseline for outliers**: find_outliers uses a channel's latest 50 uploads by default (10–200), and costs about 3 quota units. analyze_video costs about 4.
 
+## Milestone 4 notes (2026-11-08)
+
+- **14 tools** (quota cost in brackets):
+  - `get_status` (0)
+  - `search_youtube` (100 + 1, capped and cached)
+  - `get_channel` (1)
+  - `get_channel_videos` (about 3; up to 9 for popular or a format filter)
+  - `get_video` (1)
+  - `analyze_video` (about 4)
+  - `compare_videos` (1, up to 10 videos)
+  - `compare_channels` (about 3 per channel, up to 5)
+  - `find_outliers` (about 3)
+  - `track_channel` (about 3)
+  - `untrack_channel` (0)
+  - `track_video` (1–2)
+  - `untrack_video` (0)
+  - `list_tracked` (0)
+- **Added beyond the brief**: `compare_videos` and `get_status`.
+- **Moved**: `refresh_tracked` lands in Milestone 5 with the collector.
+- **Search results** are enriched with stats from videos.list (1 unit), so each hit shows views, format and lifetime views/day. Notes say plainly that ranking isn't search volume.
+- **"Popular" channel videos** means the most viewed among the latest 200 uploads. It's a local sort, labelled as such. YouTube's own popularity sort is search-only and costs 100 units.
+- **Errors** come back to Claude as tool errors with a plain label: Setup needed, API key problem, Quota used up, Search cap reached, Not found, Invalid input, or YouTube temporarily unavailable.
+- **Connected to Claude Code** at user scope through the published copy in `~/.local/share/personalvidiq`. Claude Desktop is not configured yet.
+
 ## Out of scope: ChatGPT and remote access
 
 There's no ChatGPT milestone. For reference only, from OpenAI's Apps SDK auth docs (checked 2026-11-07): ChatGPT would need a public HTTPS tunnel and OAuth 2.1, and it can't send API keys. Because the tool is local-only, the brief's items on remote exposure (remote auth and secure remote deployment in Milestone 4) don't apply.
