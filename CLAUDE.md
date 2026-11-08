@@ -15,7 +15,7 @@ When a new decision is made with the user, add it to DECISIONS.md in the same ch
 - [x] Milestone 0: solution, stdio host, `get_status` tool, Postgres, tests
 - [x] Milestone 1: YouTube Data API client (search, channels, videos, uploads playlist, quota ledger, search cap and cache, retries)
 - [x] Milestone 2: EF Core entities, migrations, stores, idempotent snapshots, 30-day purge, Postgres quota ledger and search cache
-- [ ] Milestone 3: analytics (velocity, outliers, comparisons)
+- [x] Milestone 3: analytics (velocity, lifetime views/day, engagement rates, outlier scoring, video/channel comparison services)
 - [ ] Milestone 4: the MVP MCP tools, including tracking tools
 - [ ] Milestone 5: `collect` command (on demand, no scheduler)
 - [ ] Milestone 6: research features (no autocomplete)
@@ -52,6 +52,7 @@ Integration tests need local Postgres (`brew services start postgresql@17`) and 
 
 The layers are Domain → Application → Infrastructure, with Mcp and Host on top.
 
+- **Analytics** are pure, deterministic functions in `Application/Analytics`, with unit tests. Every calculated number is a `CalculatedMetric` carrying its formula, window, sample size, confidence and notes.
 - **Business logic** lives in Application services. MCP tool classes stay thin: validate inputs, call a service, return a DTO.
 - **Services** use typed DTOs, take a `CancellationToken` everywhere, and get time from `TimeProvider`.
 - **Package versions** are managed centrally in `Directory.Packages.props`. Don't put versions in csproj files. Keep every EF Core package on the same patch version.

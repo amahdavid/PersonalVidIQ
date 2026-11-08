@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using PersonalVidIQ.Application.Analytics;
 using PersonalVidIQ.Application.DTOs.YouTube;
 using PersonalVidIQ.Application.Interfaces;
 using PersonalVidIQ.Application.Options;
@@ -99,6 +100,34 @@ public sealed class SnapshotStore(
         }
 
         return await query.OrderBy(s => s.CapturedAtUtc).ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyDictionary<string, IReadOnlyList<Observation>>> GetVideoHistoriesAsync(
+        IReadOnlyCollection<string> youTubeVideoIds, DateTimeOffset? sinceUtc, CancellationToken cancellationToken)
+    {
+        if (youTubeVideoIds.Count == 0)
+        {
+            return new Dictionary<string, IReadOnlyList<Observation>>();
+        }
+
+        await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
+        var ids = youTubeVideoIds.Distinct().ToList();
+        var query = db.VideoSnapshots.AsNoTracking().Where(s => ids.Contains(s.Video!.YouTubeVideoId));
+        if (sinceUtc is { } since)
+        {
+            query = query.Where(s => s.CapturedAtUtc >= since);
+        }
+
+        var rows = await query
+            .Select(s => new { s.Video!.YouTubeVideoId, s.CapturedAtUtc, s.ViewCount })
+            .OrderBy(s => s.CapturedAtUtc)
+            .ToListAsync(cancellationToken);
+
+        return rows.GroupBy(r => r.YouTubeVideoId, StringComparer.Ordinal)
+            .ToDictionary(
+                g => g.Key,
+                g => (IReadOnlyList<Observation>)g.Select(r => new Observation(r.CapturedAtUtc, r.ViewCount)).ToList(),
+                StringComparer.Ordinal);
     }
 
     public async Task<IReadOnlyList<ChannelSnapshot>> GetChannelSnapshotsAsync(string youTubeChannelId, DateTimeOffset? sinceUtc, CancellationToken cancellationToken)

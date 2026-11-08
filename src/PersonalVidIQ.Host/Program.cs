@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using PersonalVidIQ.Application;
 using PersonalVidIQ.Application.Interfaces;
 using PersonalVidIQ.Infrastructure;
 using PersonalVidIQ.Infrastructure.Persistence;
@@ -31,6 +32,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole(options => options.LogToStandardErrorThreshold = LogLevel.Trace);
 
 builder.Services.AddPersonalVidIQInfrastructure(builder.Configuration);
+builder.Services.AddPersonalVidIQApplication();
 
 var json = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
 

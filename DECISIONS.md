@@ -57,6 +57,28 @@ Settled 2026-11-07. The source brief is the Notion page "Personal vidIQ Alternat
 - **Quota ledger and search cache now live in Postgres**, shared by the MCP server and the CLI. Quota counts use an atomic upsert, so concurrent calls never lose a count.
 - **Migrations** are applied automatically at startup (`Database:AutoMigrate`, default on), or with `personalvidiq migrate`.
 
+## Milestone 3 notes (2026-11-08)
+
+- **View velocity** = (latest views − earlier views) ÷ real days between them.
+  - It needs 2 or more counts taken at different times.
+  - With a window (24 h or 7 d), the starting point is the newest snapshot at least that old. If the history is shorter, the output says so.
+  - A falling count gets low confidence and a note.
+  - Confidence by time span: under 1 h low, 1–6 h medium, 6 h or more high.
+- **Lifetime views/day** = views ÷ days since publish, treating any video as at least 1 hour old. Low confidence under a day old, otherwise medium.
+- **Outlier score** = the video's views/day ÷ the median views/day of the same channel's videos in the same format (Short or long-form) and of a similar age.
+  - Similar age means 0.5×–2× the video's age, widened to 0.25×–4× if fewer than 5 match. Ages under 1 day count as 1 day when matching.
+  - It uses recent snapshot velocity (7-day window, at least 12 h of history) when the video and 5 or more of its comparison group have it, and lifetime views/day otherwise. The output names the method used.
+  - Bands: 3× or more well above, 1.5× or more above, above 0.67× typical, otherwise below.
+  - It's unavailable for fewer than 5 comparison videos, a median of zero, an unknown duration, or live and upcoming videos.
+  - Confidence is high with 10 or more comparison videos and no widening, otherwise medium. It's low when the video is under a day old and the lifetime method is used.
+- **Engagement rates**: likes ÷ views and comments ÷ views, as percentages. Low confidence under 1,000 views.
+- **Channel comparison**:
+  - The period is 1–30 days, capped by the retention window. Each channel's latest 50 uploads are checked.
+  - Reported: uploads per week, Shorts vs long-form counts, and median lifetime views/day per format.
+  - From snapshots: growth in total views/day and subscriber change. Subscriber change is always low confidence because of rounding.
+- **Free history**: whenever analysis fetches fresh stats for a video or channel that's already stored, that read is saved as a snapshot.
+- **Baseline for outliers**: find_outliers uses a channel's latest 50 uploads by default (10–200), and costs about 3 quota units. analyze_video costs about 4.
+
 ## Out of scope: ChatGPT and remote access
 
 There's no ChatGPT milestone. For reference only, from OpenAI's Apps SDK auth docs (checked 2026-11-07): ChatGPT would need a public HTTPS tunnel and OAuth 2.1, and it can't send API keys. Because the tool is local-only, the brief's items on remote exposure (remote auth and secure remote deployment in Milestone 4) don't apply.

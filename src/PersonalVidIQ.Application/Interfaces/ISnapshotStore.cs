@@ -1,3 +1,4 @@
+using PersonalVidIQ.Application.Analytics;
 using PersonalVidIQ.Application.DTOs.YouTube;
 using PersonalVidIQ.Domain.Entities;
 
@@ -17,6 +18,10 @@ public interface ISnapshotStore
 
     /// <summary>Snapshots for a video, oldest first, optionally limited to those captured at or after <paramref name="sinceUtc"/>.</summary>
     Task<IReadOnlyList<VideoSnapshot>> GetVideoSnapshotsAsync(string youTubeVideoId, DateTimeOffset? sinceUtc, CancellationToken cancellationToken);
+
+    /// <summary>View-count history for many videos at once, keyed by YouTube video id. Videos with no snapshots are absent.</summary>
+    Task<IReadOnlyDictionary<string, IReadOnlyList<Observation>>> GetVideoHistoriesAsync(
+        IReadOnlyCollection<string> youTubeVideoIds, DateTimeOffset? sinceUtc, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<ChannelSnapshot>> GetChannelSnapshotsAsync(string youTubeChannelId, DateTimeOffset? sinceUtc, CancellationToken cancellationToken);
 }
