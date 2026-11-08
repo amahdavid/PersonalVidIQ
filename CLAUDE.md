@@ -14,7 +14,7 @@ When a new decision is made with the user, add it to DECISIONS.md in the same ch
 
 - [x] Milestone 0: solution, stdio host, `get_status` tool, Postgres, tests
 - [x] Milestone 1: YouTube Data API client (search, channels, videos, uploads playlist, quota ledger, search cap and cache, retries)
-- [ ] Milestone 2: EF Core entities, migrations, 30-day snapshot purge, persisted quota ledger and search cache
+- [x] Milestone 2: EF Core entities, migrations, stores, idempotent snapshots, 30-day purge, Postgres quota ledger and search cache
 - [ ] Milestone 3: analytics (velocity, outliers, comparisons)
 - [ ] Milestone 4: the MVP MCP tools, including tracking tools
 - [ ] Milestone 5: `collect` command (on demand, no scheduler)
@@ -28,7 +28,12 @@ Update this list when a milestone lands.
 dotnet build                                          # warnings are errors
 dotnet test                                           # Microsoft.Testing.Platform (set in global.json)
 dotnet run --project src/PersonalVidIQ.Host -- status # setup/health report
+dotnet run --project src/PersonalVidIQ.Host -- migrate
+dotnet run --project src/PersonalVidIQ.Host -- purge
+dotnet ef migrations add <Name> --project src/PersonalVidIQ.Infrastructure --output-dir Persistence/Migrations
 ```
+
+The `mcp` command applies pending migrations and runs the purge at startup (`Database:AutoMigrate`). A test fails if the model changes without a migration.
 
 Integration tests need local Postgres (`brew services start postgresql@17`) and the `personalvidiq_test` database. The live YouTube test is skipped unless `PERSONALVIDIQ_YOUTUBE_API_KEY` is set (about 3 units, no search).
 
@@ -49,7 +54,8 @@ The layers are Domain → Application → Infrastructure, with Mcp and Host on t
 
 - **Business logic** lives in Application services. MCP tool classes stay thin: validate inputs, call a service, return a DTO.
 - **Services** use typed DTOs, take a `CancellationToken` everywhere, and get time from `TimeProvider`.
-- **Package versions** are managed centrally in `Directory.Packages.props`. Don't put versions in csproj files.
+- **Package versions** are managed centrally in `Directory.Packages.props`. Don't put versions in csproj files. Keep every EF Core package on the same patch version.
+- **Persistence**: stores are singletons that use `IDbContextFactory`, with one short-lived context per call. Tables and columns are snake_case. Stats only ever live in snapshot tables, never on `Video` or `Channel`.
 - **Tests** are xUnit v3. Unit tests never hit the network or the database. YouTube is mocked at the HTTP level with saved fixtures.
 
 ## Environment

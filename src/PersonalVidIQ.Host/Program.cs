@@ -6,12 +6,15 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PersonalVidIQ.Application.Interfaces;
 using PersonalVidIQ.Infrastructure;
+using PersonalVidIQ.Infrastructure.Persistence;
 using PersonalVidIQ.Mcp;
 
 // Usage:
 //   personalvidiq            start the MCP server on stdio (what Claude launches)
 //   personalvidiq mcp        same as above
 //   personalvidiq status     print the setup/status report and exit
+//   personalvidiq migrate    apply pending database migrations
+//   personalvidiq purge      delete data past the 30-day retention window
 var command = args.Length > 0 ? args[0].ToLowerInvariant() : "mcp";
 
 var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
@@ -29,23 +32,45 @@ builder.Logging.AddConsole(options => options.LogToStandardErrorThreshold = LogL
 
 builder.Services.AddPersonalVidIQInfrastructure(builder.Configuration);
 
+var json = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+
 switch (command)
 {
     case "mcp":
+    {
         builder.Services.AddPersonalVidIQMcpServer();
-        await builder.Build().RunAsync();
+        using var host = builder.Build();
+        await DatabaseStartup.PrepareAsync(host.Services, CancellationToken.None);
+        await host.RunAsync();
         return 0;
+    }
 
     case "status":
     {
         using var host = builder.Build();
         var status = await host.Services.GetRequiredService<ISystemStatusService>().GetStatusAsync(CancellationToken.None);
-        Console.WriteLine(JsonSerializer.Serialize(status, new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+        Console.WriteLine(JsonSerializer.Serialize(status, json));
         return status.Problems.Count == 0 ? 0 : 1;
     }
 
+    case "migrate":
+    {
+        using var host = builder.Build();
+        var applied = await host.Services.GetRequiredService<IDatabaseMigrator>().MigrateAsync(CancellationToken.None);
+        Console.WriteLine(applied.Count == 0 ? "Database is up to date." : $"Applied: {string.Join(", ", applied)}");
+        return 0;
+    }
+
+    case "purge":
+    {
+        using var host = builder.Build();
+        var result = await host.Services.GetRequiredService<IRetentionService>().PurgeAsync(CancellationToken.None);
+        Console.WriteLine(JsonSerializer.Serialize(result, json));
+        return 0;
+    }
+
     default:
-        Console.Error.WriteLine($"Unknown command '{command}'. Use: mcp | status");
+        Console.Error.WriteLine($"Unknown command '{command}'. Use: mcp | status | migrate | purge");
         return 2;
 }
 

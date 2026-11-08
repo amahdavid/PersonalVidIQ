@@ -14,6 +14,12 @@ public sealed class SystemStatusServiceTests
         public Task<DatabaseStatus> ProbeAsync(CancellationToken cancellationToken) => Task.FromResult(status);
     }
 
+    private sealed class FakeStorage : IStorageProbe
+    {
+        public Task<StorageStatus> GetStorageAsync(CancellationToken cancellationToken) =>
+            Task.FromResult(new StorageStatus([], 1, 2, 3, 4, 5, null));
+    }
+
     private sealed class FixedTime(DateTimeOffset now) : TimeProvider
     {
         public override DateTimeOffset GetUtcNow() => now;
@@ -27,6 +33,7 @@ public sealed class SystemStatusServiceTests
             youTube,
             Options.Create(new DataCollectionOptions()),
             new FakeProbe(db),
+            new FakeStorage(),
             new InMemoryQuotaLedger(youTube, time),
             time);
     }

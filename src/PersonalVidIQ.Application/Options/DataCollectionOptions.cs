@@ -36,4 +36,19 @@ public sealed class DataCollectionOptions
 
     [Range(1, 720)]
     public int ChannelSnapshotIntervalHours { get; set; } = 24;
+
+    /// <summary>
+    /// A new snapshot is skipped when the previous one for the same video or channel is younger than this.
+    /// Makes repeated refreshes idempotent.
+    /// </summary>
+    [Range(0, 1440)]
+    public int MinSnapshotSpacingMinutes { get; set; } = 15;
+
+    /// <summary>Untracked videos and channels whose metadata hasn't been refreshed for this long are deleted (max 30).</summary>
+    [Range(1, 30)]
+    public int StaleMetadataDays { get; set; } = 30;
+
+    /// <summary>How long quota bookkeeping rows are kept. Not YouTube data.</summary>
+    [Range(1, 365)]
+    public int QuotaHistoryDays { get; set; } = 7;
 }

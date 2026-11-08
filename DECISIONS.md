@@ -40,6 +40,23 @@ Settled 2026-11-07. The source brief is the Notion page "Personal vidIQ Alternat
 - **Legacy `/c/` URLs** can't be resolved through the API, so the error asks for the @handle or the `/channel/UC…` URL instead. `/user/` URLs use `forUsername`.
 - **Search's `videoDuration=short` filter** means "under 4 minutes" to YouTube, not "is a Short". Format is still decided by the 180 s rule.
 
+## Milestone 2 notes (2026-11-08)
+
+- **Tables**: `channels`, `videos`, `channel_snapshots`, `video_snapshots`, `quota_usage`, `search_cache`.
+  - The brief's `TrackedChannel` is now `Channel` with an `IsTracked` flag, because stored videos can belong to channels you don't track.
+  - `ResearchRun` was dropped (#3).
+- **Tracking source**: a video is tracked either `Manual` (track_video) or `Channel` (through its channel). The first source sticks. Untracking a channel only untracks the videos it brought in, so manually tracked ones stay.
+- **Idempotent snapshots**: a snapshot is skipped if the same video or channel already has one from less than `MinSnapshotSpacingMinutes` ago (default 15). There's also a unique index on (item, captured time).
+- **Retention purge** runs when the MCP server starts and with `personalvidiq purge`. It deletes:
+  - snapshots older than `SnapshotRetentionDays`;
+  - untracked videos and channels not refreshed for `StaleMetadataDays` (30), with channels only removed once they have no videos;
+  - expired search cache rows;
+  - quota rows older than 7 days.
+  
+  Tracked items are never deleted. Keeping them fresh is the collector's job (Milestone 5).
+- **Quota ledger and search cache now live in Postgres**, shared by the MCP server and the CLI. Quota counts use an atomic upsert, so concurrent calls never lose a count.
+- **Migrations** are applied automatically at startup (`Database:AutoMigrate`, default on), or with `personalvidiq migrate`.
+
 ## Out of scope: ChatGPT and remote access
 
 There's no ChatGPT milestone. For reference only, from OpenAI's Apps SDK auth docs (checked 2026-11-07): ChatGPT would need a public HTTPS tunnel and OAuth 2.1, and it can't send API keys. Because the tool is local-only, the brief's items on remote exposure (remote auth and secure remote deployment in Milestone 4) don't apply.

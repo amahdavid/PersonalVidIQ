@@ -28,7 +28,7 @@ public sealed class YouTubeDataClientTests
         new HttpClient(_http) { BaseAddress = new Uri(_options.BaseUrl) },
         Options.Create(_options),
         Ledger,
-        new MemoryCache(new MemoryCacheOptions()),
+        new InMemorySearchCache(new MemoryCache(new MemoryCacheOptions())),
         _time,
         NullLogger<YouTubeDataClient>.Instance);
 

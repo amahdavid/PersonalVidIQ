@@ -6,7 +6,7 @@ namespace PersonalVidIQ.Application.Interfaces;
 public interface IQuotaLedger
 {
     /// <summary>Records one API request. Called for every attempt, including failed ones, because YouTube charges for those too.</summary>
-    void Record(string endpoint, int units);
+    Task RecordAsync(string endpoint, int units, CancellationToken cancellationToken);
 
-    QuotaUsage GetUsage();
+    Task<QuotaUsage> GetUsageAsync(CancellationToken cancellationToken);
 }

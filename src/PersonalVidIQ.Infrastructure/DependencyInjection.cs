@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -32,8 +33,16 @@ public static class DependencyInjection
         services.AddSingleton<IDatabaseProbe, NpgsqlDatabaseProbe>();
         services.AddSingleton<ISystemStatusService, SystemStatusService>();
 
-        services.AddMemoryCache();
-        services.AddSingleton<IQuotaLedger, InMemoryQuotaLedger>();
+        services.AddPooledDbContextFactory<PersonalVidIQDbContext>((sp, options) =>
+            DbContextConfiguration.Configure(options, sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString));
+        services.AddSingleton<IDatabaseMigrator, DatabaseMigrator>();
+        services.AddSingleton<IStorageProbe, StorageProbe>();
+        services.AddSingleton<IChannelStore, ChannelStore>();
+        services.AddSingleton<IVideoStore, VideoStore>();
+        services.AddSingleton<ISnapshotStore, SnapshotStore>();
+        services.AddSingleton<IRetentionService, RetentionService>();
+        services.AddSingleton<IQuotaLedger, PostgresQuotaLedger>();
+        services.AddSingleton<ISearchCache, PostgresSearchCache>();
         services.AddHttpClient<IYouTubeDataClient, YouTubeDataClient>((sp, client) =>
         {
             var yt = sp.GetRequiredService<IOptions<YouTubeOptions>>().Value;

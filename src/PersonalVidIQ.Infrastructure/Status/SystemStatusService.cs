@@ -11,6 +11,7 @@ public sealed class SystemStatusService(
     IOptions<YouTubeOptions> youTube,
     IOptions<DataCollectionOptions> collection,
     IDatabaseProbe databaseProbe,
+    IStorageProbe storageProbe,
     IQuotaLedger quotaLedger,
     TimeProvider timeProvider) : ISystemStatusService
 {
@@ -32,6 +33,26 @@ public sealed class SystemStatusService(
             problems.Add($"PostgreSQL is not reachable: {database.Error}. Check that it is running: brew services start postgresql@17");
         }
 
+        StorageStatus? storage = null;
+        QuotaUsage quota;
+        if (database.Reachable)
+        {
+            storage = await storageProbe.GetStorageAsync(cancellationToken);
+            if (storage.PendingMigrations.Count > 0)
+            {
+                problems.Add($"Database schema is out of date ({storage.PendingMigrations.Count} pending migrations). Run: personalvidiq migrate");
+                quota = EmptyQuota(yt);
+            }
+            else
+            {
+                quota = await quotaLedger.GetUsageAsync(cancellationToken);
+            }
+        }
+        else
+        {
+            quota = EmptyQuota(yt);
+        }
+
         var version = typeof(SystemStatusService).Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion?.Split('+')[0] ?? "unknown";
 
@@ -40,13 +61,20 @@ public sealed class SystemStatusService(
             timeProvider.GetUtcNow(),
             apiKeyConfigured,
             database,
+            storage,
             new SettingsSummary(
                 dc.SnapshotRetentionDays,
                 dc.ShortsMaxDurationSeconds,
                 yt.DailySearchCallCap,
                 yt.SearchCacheHours,
                 yt.DailyQuotaUnits),
-            quotaLedger.GetUsage(),
+            quota,
             problems);
+    }
+
+    private QuotaUsage EmptyQuota(YouTubeOptions yt)
+    {
+        var dayStart = YouTube.QuotaDay.StartUtc(timeProvider.GetUtcNow());
+        return new QuotaUsage(dayStart, YouTube.QuotaDay.NextStartUtc(dayStart), 0, yt.DailyQuotaUnits, 0, yt.DailySearchCallCap, new Dictionary<string, int>());
     }
 }

@@ -34,6 +34,12 @@ It is stored in .NET user secrets, outside this folder:
 dotnet user-secrets set "YouTube:ApiKey" "<key>" --project src/PersonalVidIQ.Host
 ```
 
+Create the tables (the MCP server also does this on startup):
+
+```bash
+dotnet run --project src/PersonalVidIQ.Host -- migrate
+```
+
 Check everything:
 
 ```bash
@@ -81,6 +87,16 @@ Then ask Claude to "run get_status on personalvidiq".
 
 User secrets are read from `~/.microsoft/usersecrets/`, so the published copy picks up the same API key.
 stdout is reserved for the MCP protocol; logs go to stderr (Claude Desktop shows them in its MCP logs).
+
+## Data retention
+
+YouTube's API policies allow storing public statistics for at most 30 days. PersonalVidIQ deletes snapshots
+older than `DataCollection:SnapshotRetentionDays` (max 30), and untracked videos/channels not refreshed in 30 days.
+This runs whenever the MCP server starts, or on demand:
+
+```bash
+dotnet run --project src/PersonalVidIQ.Host -- purge
+```
 
 ## Configuration
 

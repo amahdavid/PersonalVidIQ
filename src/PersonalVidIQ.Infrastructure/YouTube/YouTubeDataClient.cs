@@ -4,7 +4,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using System.Xml;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PersonalVidIQ.Application.DTOs.YouTube;
@@ -23,7 +22,7 @@ public sealed class YouTubeDataClient(
     HttpClient http,
     IOptions<YouTubeOptions> options,
     IQuotaLedger quotaLedger,
-    IMemoryCache cache,
+    ISearchCache cache,
     TimeProvider timeProvider,
     ILogger<YouTubeDataClient> logger) : IYouTubeDataClient
 {
@@ -46,13 +45,14 @@ public sealed class YouTubeDataClient(
         var normalised = request with { Query = query, MaxResults = maxResults };
         var cacheKey = SearchCacheKey(normalised);
 
-        if (Options.SearchCacheHours > 0 && cache.TryGetValue(cacheKey, out SearchResult? cached) && cached is not null)
+        var cached = Options.SearchCacheHours > 0 ? await cache.GetAsync(cacheKey, cancellationToken) : null;
+        if (cached is not null)
         {
             logger.LogInformation("search.list served from cache (0 units)");
             return cached with { FromCache = true };
         }
 
-        var usage = quotaLedger.GetUsage();
+        var usage = await quotaLedger.GetUsageAsync(cancellationToken);
         if (usage.SearchCallsUsed >= usage.SearchCallCap)
         {
             throw new YouTubeApiException(
@@ -104,7 +104,7 @@ public sealed class YouTubeDataClient(
 
         if (Options.SearchCacheHours > 0)
         {
-            cache.Set(cacheKey, result, TimeSpan.FromHours(Options.SearchCacheHours));
+            await cache.SetAsync(cacheKey, result, TimeSpan.FromHours(Options.SearchCacheHours), cancellationToken);
         }
 
         return result;
@@ -228,7 +228,7 @@ public sealed class YouTubeDataClient(
         }
 
         var cost = Options.CostOf(endpoint);
-        var usage = quotaLedger.GetUsage();
+        var usage = await quotaLedger.GetUsageAsync(cancellationToken);
         if (usage.UnitsUsed + cost > usage.DailyUnitLimit)
         {
             throw new YouTubeApiException(
@@ -242,7 +242,7 @@ public sealed class YouTubeDataClient(
         for (var attempt = 0; ; attempt++)
         {
             var stopwatch = Stopwatch.StartNew();
-            quotaLedger.Record(endpoint, cost);
+            await quotaLedger.RecordAsync(endpoint, cost, cancellationToken);
             YouTubeApiException failure;
 
             try

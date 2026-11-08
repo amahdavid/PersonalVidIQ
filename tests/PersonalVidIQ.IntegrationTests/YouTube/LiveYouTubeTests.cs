@@ -26,7 +26,7 @@ public sealed class LiveYouTubeTests
             new HttpClient { BaseAddress = new Uri(options.Value.BaseUrl) },
             options,
             new InMemoryQuotaLedger(options, TimeProvider.System),
-            new MemoryCache(new MemoryCacheOptions()),
+            new InMemorySearchCache(new MemoryCache(new MemoryCacheOptions())),
             TimeProvider.System,
             NullLogger<YouTubeDataClient>.Instance);
     }

@@ -6,8 +6,8 @@ using PersonalVidIQ.Application.Options;
 namespace PersonalVidIQ.Infrastructure.YouTube;
 
 /// <summary>
-/// Per-process quota counter. Resets when the YouTube quota day rolls over (midnight Pacific Time).
-/// Milestone 2 replaces this with a PostgreSQL-backed ledger so the MCP server and the CLI share one count.
+/// Per-process quota counter, used by unit tests. The app uses <see cref="PostgresQuotaLedger"/> so every
+/// process shares one count. Resets when the YouTube quota day rolls over (midnight Pacific Time).
 /// </summary>
 public sealed class InMemoryQuotaLedger(IOptions<YouTubeOptions> options, TimeProvider timeProvider) : IQuotaLedger
 {
@@ -15,6 +15,14 @@ public sealed class InMemoryQuotaLedger(IOptions<YouTubeOptions> options, TimePr
     private readonly Dictionary<string, int> _calls = new(StringComparer.Ordinal);
     private DateTimeOffset _dayStartUtc = DateTimeOffset.MinValue;
     private int _units;
+
+    public Task RecordAsync(string endpoint, int units, CancellationToken cancellationToken)
+    {
+        Record(endpoint, units);
+        return Task.CompletedTask;
+    }
+
+    public Task<QuotaUsage> GetUsageAsync(CancellationToken cancellationToken) => Task.FromResult(GetUsage());
 
     public void Record(string endpoint, int units)
     {
