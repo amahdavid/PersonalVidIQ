@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PersonalVidIQ.Application/PersonalVidIQ.Application.csproj" />
+    <Project Path="src/PersonalVidIQ.Domain/PersonalVidIQ.Domain.csproj" />
+    <Project Path="src/PersonalVidIQ.Host/PersonalVidIQ.Host.csproj" />
+    <Project Path="src/PersonalVidIQ.Infrastructure/PersonalVidIQ.Infrastructure.csproj" />
+    <Project Path="src/PersonalVidIQ.Mcp/PersonalVidIQ.Mcp.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PersonalVidIQ.IntegrationTests/PersonalVidIQ.IntegrationTests.csproj" />
+    <Project Path="tests/PersonalVidIQ.UnitTests/PersonalVidIQ.UnitTests.csproj" />
+  </Folder>
+</Solution>
