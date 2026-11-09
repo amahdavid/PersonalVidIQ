@@ -75,5 +75,5 @@ The layers are Domain → Application → Infrastructure, with Mcp and Host on t
 ## Environment
 
 - macOS, Apple silicon, with .NET 10 SDK and PostgreSQL 17 from Homebrew. Docker isn't installed and isn't used.
-- Registered with Claude Code at user scope (`claude mcp get personalvidiq`). It runs the published copy: `/opt/homebrew/bin/dotnet ~/.local/share/personalvidiq/personalvidiq.dll mcp`. After code changes, re-publish (`dotnet publish src/PersonalVidIQ.Host -c Release -o ~/.local/share/personalvidiq`) and start a new Claude session.
-- Git remote: none yet. GitHub CLI is logged in as `amahdavid`. Ask before creating a repo or pushing.
+- Registered with Claude Code at user scope (`claude mcp get personalvidiq`) and with Claude Desktop chats (`~/Library/Application Support/Claude/claude_desktop_config.json`). Both run the published copy: `/opt/homebrew/bin/dotnet ~/.local/share/personalvidiq/personalvidiq.dll mcp`. After code changes, re-publish (`dotnet publish src/PersonalVidIQ.Host -c Release -o ~/.local/share/personalvidiq`) and start a new Claude session (restart Claude Desktop for chats).
+- Git remote: public repo https://github.com/amahdavid/PersonalVidIQ (`origin`, branch `main`). GitHub CLI is logged in as `amahdavid`. Ask before pushing. The repo is public, so never commit secrets, real channel data or exported snapshots.

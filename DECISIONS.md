@@ -103,7 +103,8 @@ Settled 2026-11-07. The source brief is the Notion page "Personal vidIQ Alternat
 - **Search results** are enriched with stats from videos.list (1 unit), so each hit shows views, format and lifetime views/day. Notes say plainly that ranking isn't search volume.
 - **"Popular" channel videos** means the most viewed among the latest 200 uploads. It's a local sort, labelled as such. YouTube's own popularity sort is search-only and costs 100 units.
 - **Errors** come back to Claude as tool errors with a plain label: Setup needed, API key problem, Quota used up, Search cap reached, Not found, Invalid input, or YouTube temporarily unavailable.
-- **Connected to Claude Code** at user scope through the published copy in `~/.local/share/personalvidiq`. Claude Desktop is not configured yet.
+- **Connected to Claude Code** at user scope through the published copy in `~/.local/share/personalvidiq`. Also connected to Claude Desktop chats through `claude_desktop_config.json` (same published copy; restart Desktop after re-publishing).
+- **Source on GitHub, public** (2026-11-08): https://github.com/amahdavid/PersonalVidIQ. The user chose public ("make it public, it's fine"). Secrets stay in .NET user secrets and are never committed; the history was checked for the API key before the first push.
 
 ## Milestone 5 notes (2026-11-08)
 
