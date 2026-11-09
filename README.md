@@ -83,6 +83,8 @@ claude mcp add --scope user personalvidiq -- /opt/homebrew/bin/dotnet ~/.local/s
 }
 ```
 
+Or run `scripts/connect-claude-desktop.sh` from Terminal.app with Desktop quit; it does this for you.
+
 Then start a new Claude session and ask it to "run get_status on personalvidiq".
 
 ### Tools
