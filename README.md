@@ -70,7 +70,7 @@ dotnet publish src/PersonalVidIQ.Host -c Release -o ~/.local/share/personalvidiq
 claude mcp add --scope user personalvidiq -- /opt/homebrew/bin/dotnet ~/.local/share/personalvidiq/personalvidiq.dll mcp
 ```
 
-**Claude Desktop:** add to `~/Library/Application Support/Claude/claude_desktop_config.json` (use the full path; `~` is not expanded):
+**Claude Desktop:** quit Claude Desktop fully (Cmd+Q) first, because it rewrites its config when it quits and drops edits made while it was running. Then add this to `~/Library/Application Support/Claude/claude_desktop_config.json`, keeping the keys already there (use the full path; `~` is not expanded):
 
 ```json
 {
