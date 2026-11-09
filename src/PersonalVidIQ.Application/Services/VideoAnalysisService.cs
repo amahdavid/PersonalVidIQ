@@ -40,7 +40,9 @@ public sealed class VideoAnalysisService(
                 var others = uploads.Where(u => u.Id != id).ToList();
                 var cohort = await loader.BuildInputsAsync(others, cancellationToken);
                 outlier = OutlierScorer.Score(input, cohort.Append(input).ToList(), loader.OutlierSettings, timeProvider.GetUtcNow());
-                limitations.Add($"Outlier score compares against the channel's {uploads.Count} most recent uploads.");
+                limitations.Add(uploads.Count == 0
+                    ? ChannelVideoLoader.NoUploadsNote
+                    : $"Outlier score compares against the channel's {Plural(uploads.Count, "most recent upload", "most recent uploads")}.");
             }
         }
 
@@ -103,12 +105,17 @@ public sealed class VideoAnalysisService(
             .ToList();
         var scored = targets.Select(t => OutlierScorer.Score(t, inputs, loader.OutlierSettings, now)).ToList();
 
-        var notes = new List<string>
+        var notes = new List<string> { Limitations.Calculated };
+        if (uploads.Count == 0)
         {
-            Limitations.Calculated,
-            $"Baseline: the channel's {uploads.Count} most recent uploads. Shorts are 180 s or less and are only compared with Shorts.",
-        };
-        if (uploads.Count >= normalised.MaxVideos)
+            notes.Add(ChannelVideoLoader.NoUploadsNote);
+        }
+        else
+        {
+            notes.Add($"Baseline: the channel's {Plural(uploads.Count, "most recent upload", "most recent uploads")}. Shorts are 180 s or less and are only compared with Shorts.");
+        }
+
+        if (uploads.Count > 0 && uploads.Count >= normalised.MaxVideos)
         {
             notes.Add($"Only the latest {normalised.MaxVideos} uploads were checked; older videos weren't considered.");
         }
@@ -124,6 +131,8 @@ public sealed class VideoAnalysisService(
             now,
             notes);
     }
+
+    private static string Plural(int count, string singular, string plural) => $"{count} {(count == 1 ? singular : plural)}";
 
     private VideoAnalysis Build(VideoData data, VideoAnalyticsInput input, bool isTracked, OutlierResult? outlier, List<string> limitations)
     {

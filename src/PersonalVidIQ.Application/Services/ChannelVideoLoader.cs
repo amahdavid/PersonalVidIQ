@@ -20,6 +20,8 @@ public sealed class ChannelVideoLoader(
 {
     public const int MaxUploads = 200;
 
+    public const string NoUploadsNote = "This channel has no public uploads.";
+
     private DataCollectionOptions Options => options.Value;
 
     public async Task<ChannelData> GetChannelAsync(string channel, CancellationToken cancellationToken) =>
@@ -33,7 +35,22 @@ public sealed class ChannelVideoLoader(
             return [];
         }
 
-        var playlist = await youTube.GetPlaylistVideosAsync(channel.UploadsPlaylistId, Math.Clamp(maxVideos, 1, MaxUploads), cancellationToken);
+        IReadOnlyList<PlaylistVideo> playlist;
+        try
+        {
+            playlist = await youTube.GetPlaylistVideosAsync(channel.UploadsPlaylistId, Math.Clamp(maxVideos, 1, MaxUploads), cancellationToken);
+        }
+        catch (YouTubeApiException ex) when (ex.Kind == YouTubeErrorKind.NotFound)
+        {
+            // YouTube reports playlistNotFound for the uploads playlist of a channel that has never uploaded.
+            return [];
+        }
+
+        if (playlist.Count == 0)
+        {
+            return [];
+        }
+
         var batch = await youTube.GetVideosAsync(playlist.Select(p => p.VideoId).ToList(), cancellationToken);
         return batch.Videos.OrderByDescending(v => v.PublishedAtUtc).ToList();
     }

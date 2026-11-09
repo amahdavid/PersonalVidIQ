@@ -129,6 +129,24 @@ public sealed class AnalysisServiceTests
     }
 
     [Fact]
+    public async Task Channel_with_no_uploads_says_so_instead_of_erroring()
+    {
+        const string emptyId = "UCeeeeeeeeeeeeeeeeeeeeee";
+        _youTube.Channels[emptyId] = _youTube.Channels[ChannelId] with { Id = emptyId, CustomUrl = "@empty", UploadsPlaylistId = "UUeeeeeeeeeeeeeeeeeeeeee", VideoCount = 0 };
+        _youTube.MissingPlaylists.Add("UUeeeeeeeeeeeeeeeeeeeeee");
+
+        var outliers = await VideoService().FindOutliersAsync(new OutlierQuery("@empty"), Ct);
+        Assert.Equal(0, outliers.VideosChecked);
+        Assert.Empty(outliers.Outliers);
+        Assert.Contains(ChannelVideoLoader.NoUploadsNote, outliers.Notes);
+
+        var comparison = await ChannelService().CompareChannelsAsync(["@empty"], 7, Ct);
+        var activity = Assert.Single(comparison.Channels).Activity;
+        Assert.Equal(0, activity.UploadsChecked);
+        Assert.Contains(ChannelVideoLoader.NoUploadsNote, activity.UploadsPerWeek.Notes);
+    }
+
+    [Fact]
     public async Task FindOutliers_rejects_bad_window()
     {
         await Assert.ThrowsAsync<YouTubeApiException>(() => VideoService().FindOutliersAsync(new OutlierQuery("@footballfacts", PublishedWithinDays: 0), Ct));

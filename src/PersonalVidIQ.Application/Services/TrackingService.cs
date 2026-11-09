@@ -38,7 +38,9 @@ public sealed class TrackingService(
             uploads.Count,
             saved,
             [
-                $"Tracking the latest {uploads.Count} uploads now, and new uploads whenever tracked items are refreshed.",
+                uploads.Count == 0
+                    ? ChannelVideoLoader.NoUploadsNote + " New uploads will be picked up whenever tracked items are refreshed."
+                    : $"Tracking the latest {(uploads.Count == 1 ? "upload" : $"{uploads.Count} uploads")} now, and new uploads whenever tracked items are refreshed.",
                 "Velocity and growth need at least two snapshots: refresh again later (hours apart) to start measuring.",
                 $"Snapshots are kept for {options.Value.SnapshotRetentionDays} days.",
             ]);

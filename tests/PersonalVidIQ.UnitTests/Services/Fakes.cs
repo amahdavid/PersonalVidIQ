@@ -14,6 +14,9 @@ internal sealed class FakeYouTube : IYouTubeDataClient
     public Dictionary<string, List<string>> Playlists { get; } = new();
     public int Calls { get; private set; }
 
+    /// <summary>Playlists for which YouTube answers playlistNotFound (a channel that has never uploaded).</summary>
+    public HashSet<string> MissingPlaylists { get; } = [];
+
     public Task<SearchResult> SearchVideosAsync(SearchRequest request, CancellationToken cancellationToken) => throw new NotSupportedException();
 
     public Task<IReadOnlyList<ChannelData>> GetChannelsAsync(IReadOnlyCollection<string> channelIds, CancellationToken cancellationToken)
@@ -40,6 +43,11 @@ internal sealed class FakeYouTube : IYouTubeDataClient
     public Task<IReadOnlyList<PlaylistVideo>> GetPlaylistVideosAsync(string playlistId, int maxResults, CancellationToken cancellationToken)
     {
         Calls++;
+        if (MissingPlaylists.Contains(playlistId))
+        {
+            throw new YouTubeApiException(YouTubeErrorKind.NotFound, "YouTube playlistItems.list: not found (playlistNotFound).", "playlistNotFound");
+        }
+
         var ids = Playlists.TryGetValue(playlistId, out var list) ? list : [];
         return Task.FromResult<IReadOnlyList<PlaylistVideo>>(ids.Take(maxResults).Select(id => new PlaylistVideo(id, "", Videos[id].PublishedAtUtc)).ToList());
     }

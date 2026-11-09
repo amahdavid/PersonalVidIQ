@@ -84,7 +84,9 @@ public sealed class ChannelResearchService(
         var window = $"published in the last {periodDays} days";
         var coversPeriod = uploads.Count < UploadsToCheck || uploads.Min(u => u.PublishedAtUtc) <= cutoff;
 
-        var uploadNotes = coversPeriod ? new List<string>() : [$"The latest {UploadsToCheck} uploads don't reach back {periodDays} days; the true count is higher."];
+        var uploadNotes = uploads.Count == 0
+            ? [ChannelVideoLoader.NoUploadsNote]
+            : coversPeriod ? new List<string>() : [$"The latest {UploadsToCheck} uploads don't reach back {periodDays} days; the true count is higher."];
         return new ChannelPeriodActivity(
             periodDays,
             uploads.Count,

@@ -97,13 +97,14 @@ public static class OutlierScorer
             widened = true;
         }
 
-        var formatName = format == VideoFormat.Short ? "Shorts" : "long-form videos";
         if (cohort.Count < settings.MinCohortSize)
         {
+            var otherVideos = cohort.Count == 1 ? $"other {FormatName(format, 1)} is" : $"other {FormatName(format, cohort.Count)} are";
             return Unavailable(target, format, age,
-                $"Only {cohort.Count} other {formatName} from this channel are a similar age (need {settings.MinCohortSize}). " +
-                $"{sameFormat.Count} {formatName} were checked in total.",
-                cohort.Count);
+                $"Only {cohort.Count} {otherVideos} close enough in age, even after widening the age range to 0.25×–4× this video's age " +
+                $"(need {settings.MinCohortSize}). The channel's other {FormatName(format, 2)} checked: {sameFormat.Count}.",
+                cohort.Count,
+                widened: true);
         }
 
         var notes = new List<string>();
@@ -195,7 +196,16 @@ public static class OutlierScorer
             : null;
     }
 
-    private static OutlierResult Unavailable(VideoAnalyticsInput target, VideoFormat format, double? age, string reason, int cohortSize = 0, OutlierMethod? method = null) =>
+    private static string FormatName(VideoFormat format, int count) => (format, count) switch
+    {
+        (VideoFormat.Short, 1) => "Short",
+        (VideoFormat.Short, _) => "Shorts",
+        (_, 1) => "long-form video",
+        _ => "long-form videos",
+    };
+
+    private static OutlierResult Unavailable(
+        VideoAnalyticsInput target, VideoFormat format, double? age, string reason, int cohortSize = 0, OutlierMethod? method = null, bool widened = false) =>
         new(target.VideoId, target.Title, format, age is null ? null : Statistics.Round(age.Value), method, null, null, null,
-            OutlierBand.Unavailable, cohortSize, null, null, false, Confidence.Unavailable, Formula, [reason]);
+            OutlierBand.Unavailable, cohortSize, null, null, widened, Confidence.Unavailable, Formula, [reason]);
 }

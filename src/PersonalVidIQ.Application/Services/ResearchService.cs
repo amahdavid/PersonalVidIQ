@@ -95,12 +95,16 @@ public sealed class ResearchService(
         var tracked = (await videoStore.ListByChannelAsync(data.Id, cancellationToken)).Where(v => v.IsTracked).Select(v => v.YouTubeVideoId).ToHashSet();
 
         var notes = new List<string>();
-        if (order == ChannelVideoOrder.Popular)
+        if (uploads.Count == 0)
+        {
+            notes.Add(ChannelVideoLoader.NoUploadsNote);
+        }
+        else if (order == ChannelVideoOrder.Popular)
         {
             notes.Add($"'Popular' = most viewed among the channel's latest {uploads.Count} uploads (lifetime views). The API can't sort a channel's whole catalogue by popularity without an expensive search.");
         }
 
-        if (format is not null)
+        if (format is not null && uploads.Count > 0)
         {
             notes.Add($"Filtered to {(format == VideoFormat.Short ? "Shorts (180 s or less)" : "long-form videos (over 180 s)")} among the latest {uploads.Count} uploads.");
         }

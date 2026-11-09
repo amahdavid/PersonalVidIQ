@@ -45,7 +45,33 @@ public sealed class OutlierScorerTests
 
         Assert.Equal(OutlierBand.Unavailable, result.Band);
         Assert.Equal(Confidence.Unavailable, result.Confidence);
-        Assert.Contains("Shorts", result.Notes[0], StringComparison.Ordinal);
+        Assert.Contains("0 other Shorts are", result.Notes[0], StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Too_small_cohort_reports_that_widening_was_tried()
+    {
+        var target = Video("target00001", 8, 8_000, seconds: 600);
+        var videos = Baseline(4, 6, seconds: 600).Append(target).ToList();
+
+        var result = OutlierScorer.Score(target, videos, Settings, Now);
+
+        Assert.Equal(OutlierBand.Unavailable, result.Band);
+        Assert.True(result.CohortWidened);
+        Assert.Equal(4, result.CohortSize);
+        Assert.Contains("Only 4 other long-form videos are close enough in age, even after widening", result.Notes[0], StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Single_comparison_video_uses_singular_wording()
+    {
+        var target = Video("target00001", 8, 8_000, seconds: 600);
+        var videos = Baseline(1, 6, seconds: 600).Append(target).ToList();
+
+        var result = OutlierScorer.Score(target, videos, Settings, Now);
+
+        Assert.Contains("Only 1 other long-form video is close enough", result.Notes[0], StringComparison.Ordinal);
+        Assert.Contains("other long-form videos checked: 1", result.Notes[0], StringComparison.Ordinal);
     }
 
     [Fact]
