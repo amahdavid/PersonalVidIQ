@@ -101,6 +101,11 @@ Then start a new Claude session and ask it to "run get_status on personalvidiq".
 | `track_channel` / `track_video` | Start building history | ~3 / 1–2 |
 | `untrack_channel` / `untrack_video` / `list_tracked` | Manage tracking | 0 |
 | `refresh_tracked` | Snapshot what's due, pick up new uploads (`force`, `dryRun`) | ~1–10 |
+| `research_keyword` | What ranks for a keyword and how crowded it is (no search volume) | ~102 (2 if cached) |
+| `get_keyword_ideas` | Best-performing keywords and topics across tracked channels | 0 |
+| `discover_trends` | Keywords emerging across tracked channels | 0 |
+| `get_recent_uploads` | What tracked channels uploaded recently and how it's doing | 0 |
+| `get_video_idea_evidence` | Outliers, keywords and gaps to base video ideas on | 0 (~2) |
 
 User secrets are read from `~/.microsoft/usersecrets/`, so the published copy picks up the same API key.
 stdout is reserved for the MCP protocol; logs go to stderr (Claude Desktop shows them in its MCP logs).

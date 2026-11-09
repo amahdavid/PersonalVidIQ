@@ -20,7 +20,7 @@ When a new decision is made with the user, add it to DECISIONS.md in the same ch
 - [x] Milestone 3: analytics (velocity, lifetime views/day, engagement rates, outlier scoring, video/channel comparison services)
 - [x] Milestone 4: 14 MCP tools (search, channel/video lookups, analysis, outliers, comparisons, tracking, status); registered with Claude Code
 - [x] Milestone 5: `refresh_tracked` tool + `collect` command (on demand, due rules, new-upload pickup, quota budget, run log)
-- [ ] Milestone 6: research features (no autocomplete)
+- [x] Milestone 6: research features: `research_keyword`, `get_keyword_ideas`, `discover_trends`, `get_recent_uploads`, `get_video_idea_evidence` (no autocomplete, no search volume)
 
 Update this list when a milestone lands.
 
@@ -53,7 +53,7 @@ Integration tests need local Postgres (`brew services start postgresql@17`) and 
 
 ## MCP tools
 
-`get_status`, `search_youtube`, `get_channel`, `get_channel_videos`, `get_video`, `analyze_video`, `compare_videos`, `compare_channels`, `find_outliers`, `track_channel`, `untrack_channel`, `track_video`, `untrack_video`, `list_tracked`, `refresh_tracked`.
+`get_status`, `search_youtube`, `get_channel`, `get_channel_videos`, `get_video`, `analyze_video`, `compare_videos`, `compare_channels`, `find_outliers`, `track_channel`, `untrack_channel`, `track_video`, `untrack_video`, `list_tracked`, `refresh_tracked`, `research_keyword`, `get_keyword_ideas`, `discover_trends`, `get_recent_uploads`, `get_video_idea_evidence`.
 
 - **Tool classes** (`src/PersonalVidIQ.Mcp/Tools`) only parse parameters and call a service through `ToolGuard.Run`, which turns `YouTubeApiException` into a readable `McpException`.
 - **Enums** serialize as snake_case strings.
@@ -65,6 +65,7 @@ Integration tests need local Postgres (`brew services start postgresql@17`) and 
 The layers are Domain → Application → Infrastructure, with Mcp and Host on top.
 
 - **Analytics** are pure, deterministic functions in `Application/Analytics`, with unit tests. Every calculated number is a `CalculatedMetric` carrying its formula, window, sample size, confidence and notes.
+- **Research** (`Application/Research`) works over stored data at no quota cost. Keyword performance is the median channel-relative ratio (the outlier ratio), so channels of any size and format compare fairly. The stop words are generic only (English function words, YouTube boilerplate), with niche or language additions going through `Research:ExtraStopWords`. The app never writes ideas itself: it returns evidence and Claude proposes the ideas.
 - **Business logic** lives in Application services. MCP tool classes stay thin: validate inputs, call a service, return a DTO.
 - **Services** use typed DTOs, take a `CancellationToken` everywhere, and get time from `TimeProvider`.
 - **Package versions** are managed centrally in `Directory.Packages.props`. Don't put versions in csproj files. Keep every EF Core package on the same patch version.

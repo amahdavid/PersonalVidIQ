@@ -17,7 +17,15 @@ internal sealed class FakeYouTube : IYouTubeDataClient
     /// <summary>Playlists for which YouTube answers playlistNotFound (a channel that has never uploaded).</summary>
     public HashSet<string> MissingPlaylists { get; } = [];
 
-    public Task<SearchResult> SearchVideosAsync(SearchRequest request, CancellationToken cancellationToken) => throw new NotSupportedException();
+    /// <summary>Video ids returned for any search.</summary>
+    public List<string> SearchResults { get; } = [];
+
+    public Task<SearchResult> SearchVideosAsync(SearchRequest request, CancellationToken cancellationToken)
+    {
+        Calls++;
+        var hits = SearchResults.Select(id => Videos[id]).Select(v => new SearchHit(v.Id, v.ChannelId, v.ChannelTitle, v.Title, v.Description, v.PublishedAtUtc, null)).ToList();
+        return Task.FromResult(new SearchResult(request, hits, 1_000_000, false, DateTimeOffset.UtcNow));
+    }
 
     public Task<IReadOnlyList<ChannelData>> GetChannelsAsync(IReadOnlyCollection<string> channelIds, CancellationToken cancellationToken)
     {

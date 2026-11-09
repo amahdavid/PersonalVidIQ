@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using PersonalVidIQ.Application.Interfaces;
+using PersonalVidIQ.Application.Research;
 using PersonalVidIQ.Application.Services;
 
 namespace PersonalVidIQ.Application;
@@ -14,6 +15,9 @@ public static class DependencyInjection
         services.AddTransient<IResearchService, ResearchService>();
         services.AddTransient<ITrackingService, TrackingService>();
         services.AddTransient<ICollectionService, CollectionService>();
+        services.AddTransient<ResearchDataLoader>();
+        services.AddTransient<IKeywordResearchService, KeywordResearchService>();
+        services.AddTransient<ITrendResearchService, TrendResearchService>();
         return services;
     }
 }

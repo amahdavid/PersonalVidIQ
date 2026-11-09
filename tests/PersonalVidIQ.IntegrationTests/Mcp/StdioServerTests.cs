@@ -52,8 +52,9 @@ public sealed class StdioServerTests
         var names = (await client.ListToolsAsync(cancellationToken: ct)).Select(t => t.Name).Order().ToList();
 
         Assert.Equal(
-            ["analyze_video", "compare_channels", "compare_videos", "find_outliers", "get_channel", "get_channel_videos", "get_status",
-             "get_video", "list_tracked", "refresh_tracked", "search_youtube", "track_channel", "track_video", "untrack_channel", "untrack_video"],
+            ["analyze_video", "compare_channels", "compare_videos", "discover_trends", "find_outliers", "get_channel", "get_channel_videos",
+             "get_keyword_ideas", "get_recent_uploads", "get_status", "get_video", "get_video_idea_evidence", "list_tracked", "refresh_tracked",
+             "research_keyword", "search_youtube", "track_channel", "track_video", "untrack_channel", "untrack_video"],
             names);
     }
 

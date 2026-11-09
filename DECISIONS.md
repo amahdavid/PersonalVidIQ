@@ -123,6 +123,30 @@ Settled 2026-11-07. The source brief is the Notion page "Personal vidIQ Alternat
 - **Run log**: each refresh is recorded in `collection_runs` (status, counts, units, error) and kept for 7 days. `get_status` shows the last run, what's due now and when the next item comes due.
 - **Typical cost**: about 1 unit per 50 due videos, plus 1 per tracked channel's uploads check.
 
+## Milestone 6 notes (2026-11-08)
+
+- **Five tools.** No new tables or stored keyword data: everything is worked out at request time from stored videos, which already follow the 30-day rule.
+  - `research_keyword` (about 102 units, search cached for 24 h): competition stats on the top results.
+    - Stats: median views and views/day, the share published in the last 30 days, the share that are Shorts, the share with the keyword in the title, distinct channels, median channel subscribers, and the share from channels under 10k subscribers (`Research:SmallChannelSubscribers`).
+    - Also lists related terms from result titles and tags. YouTube's total-results figure is labelled as a rough index count.
+  - `get_keyword_ideas` (0 units): keywords from tracked channels' stored titles and tags, ranked by median channel-relative ratio. Takes an optional seed and groups keywords into topics.
+  - `discover_trends` (0 units): keywords emerging across tracked channels, comparing a recent window of 1–15 days with the window before it.
+  - `get_recent_uploads` (0 units): competitor upload monitoring.
+  - `get_video_idea_evidence` (0 units, or about 2 if your channel isn't stored): recent outliers, best keywords, emerging keywords, and keyword gaps against your channel.
+- **Keywords** are single words and two-word phrases from titles, plus tags of 1–4 words.
+  - Tokenising works on Unicode letters and digits, so any language is handled.
+  - Built-in stop words are English function words and YouTube boilerplate only, and you can add more in config. Nothing niche-specific is built in.
+  - Words that only ever appear inside one phrase are folded into that phrase.
+- **Keyword score** = the median channel-relative ratio of videos that use the keyword (1.0 = typical for that channel, format and age).
+  - It's labelled as a correlation, and confidence tops out at medium: 8 or more scored videos from 2 or more channels is medium, 3 or more is low.
+  - A keyword is reported only once it's in at least 3 videos (`Research:MinVideosPerTerm`).
+- **Topics**: keywords whose video sets overlap by at least 0.5 (Jaccard) are grouped. Each topic is labelled with its most specific phrase that's in at least half of the topic's videos.
+- **Emerging keywords** need 3 or more recent videos, and 2 or more channels when at least 2 are tracked. The keyword must then be used at least twice as often as in the previous window, or its recent videos must have a median ratio of 1.5 or more, or both.
+  - It's never called a trend on the strength of one video, and it's never a claim about YouTube-wide demand.
+  - Confidence is medium with 3 or more channels and 5 or more scored videos, otherwise low.
+- **Video ideas**: the app returns evidence and how to use it. Claude writes the ideas and cites the evidence, which keeps the app at $0 with no LLM API.
+- **Not done**: no autocomplete (#10), no search volume, and no paid keyword provider. A paid provider is worth looking at only if the free signals prove too thin in real use (open question).
+
 ## Out of scope: ChatGPT and remote access
 
 There's no ChatGPT milestone. For reference only, from OpenAI's Apps SDK auth docs (checked 2026-11-07): ChatGPT would need a public HTTPS tunnel and OAuth 2.1, and it can't send API keys. Because the tool is local-only, the brief's items on remote exposure (remote auth and secure remote deployment in Milestone 4) don't apply.
